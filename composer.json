@@ -1,0 +1,23 @@
+{
+  "name": "acme/laravel-stacked",
+  "description": "Laravel starter kit with stacked layout (Blade + Tailwind + DaisyUI) and built-in authentication via Breeze",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Acme\\Stacked\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=8.2",
+    "laravel/framework": ">=11.0",
+    "laravel/breeze": "^2.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Acme\\Stacked\\LaravelStackedServiceProvider"
+      ]
+    }
+  }
+}

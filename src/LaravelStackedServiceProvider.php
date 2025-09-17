@@ -1,9 +1,9 @@
 <?php
 
-namespace Acme\\Stacked;
+namespace Acme\Stacked;
 
-use Illuminate\\Support\\ServiceProvider;
-use Acme\\Stacked\\Console\\InstallCommand;
+use Illuminate\Support\ServiceProvider;
+use Acme\Stacked\Console\InstallCommand;
 
 class LaravelStackedServiceProvider extends ServiceProvider
 {

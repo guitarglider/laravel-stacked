@@ -1,56 +1,34 @@
 <?php
 
-namespace Acme\\Stacked\\Console;
+namespace Acme\Stacked\Console;
 
-use Illuminate\\Console\\Command;
-use Illuminate\\Filesystem\\Filesystem;
-use Illuminate\\Support\\Facades\\Artisan;
+use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Artisan;
 
 class InstallCommand extends Command
 {
     protected $signature = 'stacked:install {--force : Overwrite existing files}';
-    protected $description = 'Install Breeze auth and the Stacked layout (Blade + Tailwind + DaisyUI)';
+    protected $description = 'Install Breeze (Blade) and publish <x-layouts.app> with clean stacked header + auth views + dashboard';
 
     public function handle(): int
     {
         $fs = new Filesystem();
-        $this->info('Installing Auth (Breeze) + Stacked layout...');
+        $this->info('Installing Breeze + Stacked component layout...');
 
-        // Breeze installieren
+        // Breeze (Blade)
         $this->components->task('Scaffolding Breeze (Blade)', function () {
             Artisan::call('breeze:install', ['stack' => 'blade']);
         });
 
-        // Layout Views kopieren
-        $this->copyDirectory(
-            $fs,
-            __DIR__.'/../../stubs/resources/views',
-            resource_path('views')
-        );
+        // Copy views (component layout + auth overrides + welcome + dashboard)
+        $this->copyDirectory($fs, __DIR__.'/../../stubs/resources/views', resource_path('views'));
 
-        // Tailwind Config kopieren
-        $this->copyFile(
-            __DIR__.'/../../stubs/tailwind.config.js',
-            base_path('tailwind.config.js')
-        );
-
-        // CSS Stub anlegen
-        $cssTarget = resource_path('css/app.css');
-        if (! $fs->exists($cssTarget)) {
-            $this->copyFile(
-                __DIR__.'/../../stubs/resources.css.stub',
-                $cssTarget
-            );
-        }
+        // Public logo
+        $this->copyFile(__DIR__.'/../../stubs/public/logo.svg', public_path('logo.svg'));
 
         $this->newLine();
-        $this->components->info('Done! Breeze auth + Stacked layout installed.');
-        $this->line('Next steps:');
-        $this->line('  • composer dump-autoload (falls benötigt)');
-        $this->line('  • npm i && npm run dev');
-        $this->line('  • php artisan migrate');
-        $this->line('  • Öffne /register oder /login');
-
+        $this->components->info('Done! Now run: npm install && npm run dev, then php artisan migrate');
         return self::SUCCESS;
     }
 
@@ -61,7 +39,6 @@ class InstallCommand extends Command
         }
         $fs->ensureDirectoryExists($to);
         $fs->copyDirectory($from, $to);
-        $this->components->info("Copied directory: {$from} -> {$to}");
     }
 
     protected function copyFile(string $from, string $to): void
@@ -70,11 +47,6 @@ class InstallCommand extends Command
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-        if (file_exists($to) && ! $this->option('force')) {
-            $this->components->warn("Skip existing: {$to} (use --force to overwrite)");
-            return;
-        }
         copy($from, $to);
-        $this->components->info("Copied file: {$from} -> {$to}");
     }
 }
